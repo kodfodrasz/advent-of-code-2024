@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Array.fs" />
+    <Compile Include="Array2D.fs" />
+    <Compile Include="Seq.fs" />
+    <Compile Include="String.fs" />
+    <Compile Include="Result.fs" />
+    <Compile Include="Parse.fs" />
+    <Compile Include="Sets.fs" />
+    <Compile Include="Combinatorics.fs" />
+    <Compile Include="NumberTheory.fs" />
+    <Compile Include="AdventOfCode.fs" />
+  </ItemGroup>
+
+</Project>
