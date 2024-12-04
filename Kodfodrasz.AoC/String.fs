@@ -14,7 +14,7 @@ let notNullOrWhiteSpace = System.String.IsNullOrWhiteSpace >> not
 
 let join (separator: string) (seq: string seq) = System.String.Join(separator, seq)
 
-let split separator (str: string) = str.Split separator
+let split ([<System.ParamArray>] separator: char array) (str: string) = str.Split(separator)
 
 let replace (a: string) (b: string) (str: string) = str.Replace(a, b)
 
