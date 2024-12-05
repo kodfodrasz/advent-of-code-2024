@@ -4,7 +4,7 @@ open System
 open Kodfodrasz.AoC
 
 
-let parseInput (input: string): Result<'a list, string> =
+let parseInput (input: string): Result<_ list, string> =
   input.Split('\n')
   |> Seq.choose (fun line -> 
     line.Split([|' '; '\t'|],
