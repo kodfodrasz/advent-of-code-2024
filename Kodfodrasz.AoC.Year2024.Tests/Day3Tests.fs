@@ -29,11 +29,15 @@ let ``Answer 1 for example input`` () =
        let expected: Result<int64, string> = Ok 161
        actual = expected @>
 
-[<Fact(Skip="TODO")>]
+let exampleInput2 = """
+xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))
+"""
+
+[<Fact>]
 let ``Answer 2 for example input`` () =
-  let input = parseInput exampleInput
+  let input = parseInput exampleInput2
 
   test
     <@ let actual = Result.bind answer2 input
-       let expected: Result<int64, string> = Ok 0 // TODO
+       let expected: Result<int64, string> = Ok 48
        actual = expected @>

@@ -3,6 +3,7 @@ module Kodfodrasz.AoC.Year2024.Day3
 open System
 open Kodfodrasz.AoC
 open System.Text.RegularExpressions
+open System.Text
 
 type parsedinput = string
 
@@ -22,7 +23,30 @@ let answer1 (input : parsedinput) : Result<int64,string> =
   |> Ok
 
 let answer2  (input : parsedinput)  : Result<int64,string>  =
-  failwith "TODO"
+  //
+  let sb = StringBuilder(input)
+  // Non-greedy capture (.*?) ensures no overlap in matches
+  // https://regex101.com/r/m6LzEp/1
+  let matches = Regex.Matches(sb.ToString(), @"(?<xclude>don't\(\).*?do\(\))", RegexOptions.ExplicitCapture)
+
+  // remove matches, from back to start to avoid need to recalculate indices
+  matches
+  |> Seq.sortByDescending( fun m -> m.Index)
+  |> Seq.iter( fun m -> 
+    sb.Remove(m.Index, m.Length) |> ignore
+  )
+
+  // See if any trailing don't remains
+  let matches2 = Regex.Matches(sb.ToString(), @"(?<xclude>don't\(\).*?$)", RegexOptions.ExplicitCapture)
+  // same code but actually 0|1 result may arise
+  matches2
+  |> Seq.sortByDescending( fun m -> m.Index)
+  |> Seq.iter( fun m -> 
+    sb.Remove(m.Index, m.Length) |> ignore
+  )
+
+  sb.ToString()
+  |> answer1
 
 type Solver() =
   inherit SolverBase("Mull It Over")
