@@ -19,27 +19,48 @@ let parseInput (input: string): Result<parsedinput, string> =
   |> Ok 
 
 
+let isIncreasing (row : _ seq) : bool = 
+  Seq.pairwise row
+  |> Seq.forall (fun (a,b) -> a < b)
+let isDecreasing (row : _ seq) : bool = 
+  Seq.pairwise row
+  |> Seq.forall (fun (a,b) -> a > b)
+let isSmallSlope (row : _ seq) : bool = 
+  Seq.pairwise row
+  |> Seq.forall (fun (a,b) -> abs(a - b) <= 3)
+
+let isSafe (row : _ seq) : bool = 
+  (row |> isSmallSlope) && ( row |> isIncreasing || row |> isDecreasing )
+
+
 let answer1 (input : parsedinput) : Result<int,string> =
-  let isIncreasing (row : int array) : bool = 
-    Seq.pairwise row
-    |> Seq.forall (fun (a,b) -> a < b)
-  let isDecreasing (row : int array) : bool = 
-    Seq.pairwise row
-    |> Seq.forall (fun (a,b) -> a > b)
-  let isSmallSlope (row : int array) : bool = 
-    Seq.pairwise row
-    |> Seq.forall (fun (a,b) -> abs(a - b) <= 3)
-
-  let isSafe (row : int array) : bool = 
-    (row |> isSmallSlope) && ( row |> isIncreasing || row |> isDecreasing )
-
   input
   |> Seq.where isSafe
   |> Seq.length
   |> Ok
 
+let skipIndex (arr: 'a array) idx : 'a seq =
+  seq {
+    for i in arr.GetLowerBound(0) .. arr.GetUpperBound(0) do 
+      if i <> idx then
+        yield arr[i]
+  }
+
+let variations (row: _ array) = 
+  seq {0 .. row.Length}
+  |> Seq.map (skipIndex row)
+  |> Array.ofSeq
+
+let isSafeRelaxed (row : _ array) : bool = 
+  row |> variations
+  |> Array.Parallel.exists isSafe
+  
+
 let answer2  (input : parsedinput)  : Result<int,string>  =
-  Error "TODO"
+  input
+  |> Seq.where isSafeRelaxed
+  |> Seq.length
+  |> Ok
 
 type Solver() =
   inherit SolverBase("Red-Nosed Reports")
