@@ -8,8 +8,9 @@ open System.Text
 type parsedinput = string
 
 let parseInput (input: string): Result<parsedinput, string> =
-  input
-  |> String.trim
+  // Need to join the lines to properly handle sections where they overlap multiple lines
+  input.Split("\n", StringSplitOptions.RemoveEmptyEntries ||| StringSplitOptions.TrimEntries)
+  |> String.join ""
   |> Ok 
 
 let answer1 (input : parsedinput) : Result<int64,string> =
