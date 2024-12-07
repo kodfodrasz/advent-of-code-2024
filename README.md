@@ -52,7 +52,7 @@ No CI releases are planned now.
 
 This mostly a note to self at the moment
 
-1. ensure you have at least [.Net SDK 8.0](https://dotnet.microsoft.com/en-us/download) installed
+1. ensure you have at least [.Net SDK 9.0](https://dotnet.microsoft.com/en-us/download) installed
 2. clone the repository
 3. change directory to the cloned repository root
 4. build a single file binary
