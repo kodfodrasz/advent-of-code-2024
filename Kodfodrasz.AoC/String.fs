@@ -18,6 +18,8 @@ let split ([<System.ParamArray>] separator: char array) (str: string) = str.Spli
 
 let replace (a: string) (b: string) (str: string) = str.Replace(a, b)
 
+let toCharArray (str:string) = str.ToCharArray()
+
 /// Transliterate a set of characters to a different set much like the UNIX tr(1) tool
 let tr (fromSymbols:string) (toSymbols:string) (input:string) =
   // TODO: ensure same length
