@@ -48,13 +48,13 @@ let ``Answer 1 for example input`` () =
        let expected: Result<int, string> = Ok 18
        actual = expected @>
 
-[<Fact(Skip="TODO")>]
+[<Fact>]
 let ``Answer 2 for example input`` () =
   let input = parseInput exampleInput
 
   test
     <@ let actual = Result.bind answer2 input
-       let expected: Result<int, string> = Ok 31
+       let expected: Result<int, string> = Ok 9
        actual = expected @>
 
 
@@ -64,4 +64,12 @@ let ``Answer 1 debug (0,4) scanDiagonalDownRight`` () =
 
   test
     <@ let actual = scanDiagonalDownRight input (0,4) |> isXMAS
+       actual = true @>
+
+[<Fact>]
+let ``Answer 2 debug (1,2) isXMAS2`` () =
+  let input = parseInput exampleInput |> Result.defaultValue null
+
+  test
+    <@ let actual = isXMAS2 input (1,2)
        actual = true @>

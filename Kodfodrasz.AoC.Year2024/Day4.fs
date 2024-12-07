@@ -108,8 +108,40 @@ let answer1 (input : parsedinput) : Result<int,string> =
   |> Seq.length
   |> Ok
 
+let isXMAS2 (input : _ array array) (row, col) : bool = 
+  let max_row = input.Length - 1 
+  let max_col = input[0].Length - 1
+
+  if row = 0 || col = 0 || row = max_row || col = max_col then false
+  else
+    let cx = input[row][col]
+    let ul = input[row - 1][col - 1]
+    let ur = input[row - 1][col + 1]
+    let ll = input[row + 1][col - 1]
+    let lr = input[row + 1][col + 1]
+
+    let d1 = Array.sort [| ul; lr |]
+    let d2 = Array.sort [| ur; ll;|]
+
+    cx = 'A' && d1 = [| 'M'; 'S'; |] && d2 = [| 'M'; 'S'; |]
+
+
 let answer2 (input : parsedinput) : Result<int,string>  =
-  failwith "TODO"
+  let rowIndices = Seq.toArray (seq { 1 .. input.Length - 2})
+  let colIndices = Seq.toArray (seq { 1 .. input[0].Length - 2})
+
+  let checkRow r =
+    seq { 
+      for c in colIndices do
+        yield isXMAS2 input (r, c)
+    }
+    |> Seq.toArray
+
+  Seq.toArray rowIndices
+  |> Array.Parallel.collect checkRow
+  |> Seq.where id
+  |> Seq.length
+  |> Ok
 
 type Solver() =
   inherit SolverBase("Ceres Search")
