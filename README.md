@@ -36,7 +36,7 @@ If you would like to know more about it, you can read about it here: <https://ad
 
 ### Compile it yourself
 
-1. ensure you have at least [.Net SDK 8.0](https://dotnet.microsoft.com/en-us/download) installed
+1. ensure you have at least [.Net SDK 9.0](https://dotnet.microsoft.com/en-us/download) installed
 2. clone the repository
 3. change directory to the cloned repository root
 2. set two environment variables:
@@ -59,17 +59,17 @@ This mostly a note to self at the moment
 
     ```powershell
     # This example is for powershell
-    # You may need to change the platform identifier [RID](https://learn.microsoft.com/en-us/dotnet/core/compatibility/sdk/8.0/rid-graph). 
+    # You may need to change the platform identifier [RID](https://learn.microsoft.com/en-us/dotnet/core/compatibility/sdk/9.0/rid-graph). 
     $target_rid="win-x64"
     dotnet publish -c Release `
-      -f net8.0 -r $target_rid `
+      -f net9.0 -r $target_rid `
       --self-contained true `
       -p:PublishSingleFile=true `
       -p:EnableCompressionInSingleFile=true `
       -p:IncludeAllContentForSelfExtract=yes `
       .\Kodfodrasz.AoC.Cli\Kodfodrasz.AoC.Cli.fsproj
 
-    $result_dir="Kodfodrasz.AoC.Cli\bin\Release\net8.0\$target_rid\publish\"
+    $result_dir="Kodfodrasz.AoC.Cli\bin\Release\net9.0\$target_rid\publish\"
     echo "The binary is in $result_dir" 
     ```
 5. You can now run the binary on another computer, and it doesn't need to have the relevant .Net Runtime/SDK installed!
