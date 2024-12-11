@@ -27,38 +27,78 @@ let ``Answer 1 for example input`` () =
   test
     <@ answer1 [125L; 17L] = Ok 55312 @>
 
-[<Fact(Skip="TODO")>]
+[<Fact(Skip = "No expected value in problem")>]
 let ``Answer 2 for example input`` () =
-  let input = parseInput exampleInput
-
   test
-    <@ let actual = Result.bind answer2 input
-       let expected: Result<int, string> = Ok -99999 // TODO
-       actual = expected @>
+    <@ answer2 [125L; 17L] = Ok 55312 @>
 
 [<Fact>]
 let ``Answer 1 helper test`` () =
   test
     <@ 
-      pluto 0L = [ 1L ]
+      pluto 0L = [| 1L |]
     @>
   test
     <@ 
-      pluto 1L = [ 2024L ]
+      pluto 1L = [| 2024L |]
     @>
   test
     <@ 
-      pluto 2024L = [ 20L; 24L ]
+      pluto 2024L = [| 20L; 24L |]
     @>
   test
     <@ 
-      pluto 1000L = [ 10L; 0L ]
+      pluto 1000L = [| 10L; 0L |]
     @>
   test
     <@ 
-      pluto 99 = [ 9L; 9L ]
+      pluto 99 = [| 9L; 9L |]
     @>
   test
     <@ 
-      pluto 999 = [ 2021976L ]
+      pluto 999 = [| 2021976L |]
     @>
+
+[<Fact>]
+let ``Answer 2 helper test for example input`` () =
+  test
+    <@ answer2_raw 1 1 [125L; 17L] = Ok 3 @>
+  test
+    <@ answer2_raw 1 2 [125L; 17L] = Ok 4 @>
+  test
+    <@ answer2_raw 2 3 [125L; 17L] = Ok 5 @>
+  test
+    <@ answer2_raw 2 6 [125L; 17L] = Ok 22 @>
+  test
+    <@ answer2_raw 3 6 [125L; 17L] = Ok 22 @>
+  test
+    <@ answer2_raw 4 6 [125L; 17L] = Ok 22 @>
+  test
+    <@ answer2_raw 5 6 [125L; 17L] = Ok 22 @>
+  test
+    <@ answer2_raw 3 25 [125L; 17L] = Ok 55312 @>
+  test
+    <@ answer2_raw 5 25 [125L; 17L] = Ok 55312 @>
+  test
+    <@ answer2_raw 7 25 [125L; 17L] = Ok 55312 @>
+  test
+    <@ answer2_raw 10 25 [125L; 17L] = Ok 55312 @>
+  test
+    <@ answer2_raw 25 25 [125L; 17L] = Ok 55312 @>
+
+[<Fact>]
+let ``Answer 2 helper test for example input 2`` () =
+  test
+    <@ answer2_raw 1 1 [0L; ] = Ok 1 @>
+  test
+    <@ answer2_raw 1 1 [1L; ] = Ok 1 @>
+  test
+    <@ answer2_raw 1 1 [17L; ] = Ok 2 @>
+  test
+    <@ answer2_raw 1 1 [177L; ] = Ok 1 @>
+  test
+    <@ answer2_raw 1 1 [111000L; ] = Ok 2 @>
+  test
+    <@ answer2_raw 1 3 [11111111L; ] = Ok 8 @>
+  test
+    <@ answer2_raw 1 3 [10010000L; ] = Ok 4 @>
