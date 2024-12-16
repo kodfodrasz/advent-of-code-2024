@@ -5,6 +5,7 @@
     <GenerateProgramFile>false</GenerateProgramFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Templates\DayTestsTemplate.fs" />
     <Compile Include="Day1Tests.fs" />
     <Compile Include="Day2Tests.fs" />
     <Compile Include="Day3Tests.fs" />
