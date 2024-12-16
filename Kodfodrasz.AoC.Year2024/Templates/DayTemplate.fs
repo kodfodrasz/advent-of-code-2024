@@ -1,8 +1,6 @@
 [<Kodfodrasz.AoC.AdventOfCode.IgnoreSolver("This is a template. Delete attribute when using")>]
 module Kodfodrasz.AoC.Year2024.DayX
 
-let solverName = "TODO"
-
 open System
 open System.Text.RegularExpressions
 open Kodfodrasz.AoC
@@ -32,7 +30,7 @@ let answer2 (data : _ list) =
   failwith "TODO"
 
 type Solver() =
-  inherit SolverBase(solverName)
+  inherit SolverBase("<SOLVER_NAME>")
   with
     override this.Solve input =
       input
