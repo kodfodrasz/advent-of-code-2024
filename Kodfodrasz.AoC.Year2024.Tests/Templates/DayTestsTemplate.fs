@@ -8,28 +8,19 @@ open Kodfodrasz.AoC.Year2024.DayX
 
 
 let exampleInput = """
-3   4
-4   3
-2   5
-1   3
-3   9
-3   3
+1
+2
+3
+4
   """
 
 [<Fact(Skip="This is a template")>]
 let ``Parsing example input`` () =
-  let expected: Result<obj list, string> = Ok [ 
-      3, 4;
-      4, 3;
-      2, 5;
-      1, 3;
-      3, 9;
-      3, 3;
-  ]
+  let expected = [ 1; 2; 3; 4; ]
 
   test
     <@ let actual = parseInput exampleInput
-       actual = expected @>
+       actual = Ok expected @>
 
 [<Fact(Skip="This is a template")>]
 let ``Answer 1 for example input`` () =

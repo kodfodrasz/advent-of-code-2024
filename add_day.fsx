@@ -1,3 +1,4 @@
+#!/usr/bin/env dotnet fsi
 #r "nuget: Argu"
 #r "nuget: FSharp.Data"
 
@@ -24,17 +25,16 @@ type CLIArgs =
 
 let getDayFromArguments (parsedArguments:ParseResults<CLIArgs>) =
     match parsedArguments.TryGetResult CLIArgs.Day with
-    | Some day -> 
-      if day > 0 && day <= 31 then
-        day
-      else
-        failwithf "The Day specified is not a valid December day: %d" day
+    | Some day -> day
     | None ->
         let today = DateTime.Now
         if today.Month = 12 && today.Year = projectYear then
             today.Day
         else
             failwith "Day not specified and today is not a December day."
+    |> function
+    | day when  day > 0 && day <= 25 -> day
+    | day -> failwithf "The Day specified is not a valid Advent of Code day (1..25): %d" day
 
 let templateDaySolution (day: int) (solverName: string) =
     let templateContent = File.ReadAllText(templateSolutionFile)

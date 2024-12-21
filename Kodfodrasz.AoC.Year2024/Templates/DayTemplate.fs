@@ -5,28 +5,14 @@ open System
 open System.Text.RegularExpressions
 open Kodfodrasz.AoC
 
+type parsedInput = int list
+let parseInput (input: string): Result<parsedInput,string> = 
+  Error "TODO"
 
-let parseInputLine (input : string) : _ option = 
-  //Regex.Match(input, @"^\s*(?<cards>[2-9AKQJT]{5})\s+(?<bid>\d+)\s*$", RegexOptions.ExplicitCapture)
-  //|> function
-  //  | m when m.Success -> 
-  //    let cards = m.Groups["cards"].Value.ToCharArray() |> Seq.choose Card.tryParse |> Seq.toList
-  //    let bidMaybe = m.Groups["bid"].Value |> Parse.parseInt64
-      
-  //    match cards, bidMaybe with
-  //    | cards, Some bid when 5 = List.length cards -> Some { Cards = cards; Bid = bid }
-  //    | _ -> None
-  //  | _ -> None
+let answer1 (data : parsedInput) =
   failwith "TODO"
 
-
-let parseInput : string -> Result<obj list,string> = 
-  Parse.parsePuzzleInputLines parseInputLine
-
-let answer1 (data : _ list) =
-  failwith "TODO"
-
-let answer2 (data : _ list) =
+let answer2 (data : parsedInput) =
   failwith "TODO"
 
 type Solver() =
