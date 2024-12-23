@@ -67,40 +67,24 @@ let answer2_params (len) (data : parsedInput) =
         Array.zip c p
     )
 
-  let grouppeds = 
+  let allSequences =
     priceWithChanges
-    |> Array.Parallel.map (
-      // add indices, as only the first occurence of each pattern can be matched
-      Array.mapi( fun i (c, p) -> c, (p, i) )
-      >> Array.groupBy fst 
-      >> Array.map(fun (k, vals) -> 
-        // first occurence
-        let (_, (p, _)) = Array.minBy (snd >> snd) vals
-        (k, p))
-        // patterns and corresponding values
-      >> Map.ofArray)
-
-  let groups = 
-    grouppeds
-    |> Seq.collect Map.keys
+    |> Seq.collect (Array.map fst)
+    |> Seq.distinct
     |> Seq.toArray
 
-  // now it is time find the most bestest for each group
-  let gains =
-    groups
-    |> Array.Parallel.map(fun c ->
-        let gain = 
-          grouppeds
-          |> Seq.choose (Map.tryFind c >> Option.map int64)
-          |> Seq.sum
-        c, gain
+  let allResults = 
+    allSequences
+    |> Array.Parallel.map (fun seq -> 
+      priceWithChanges // all seller, seq win 4 * price
+      |> Array.choose (Array.tryFind(fun (s,p) -> s = seq) >> Option.map snd)
+      |> Array.sum
     )
 
-  let best =
-    gains
-    |> Array.maxBy snd
-
-  Ok (snd best)
+  allResults
+    |> Array.max
+    |> int64
+    |>Ok
 
 let answer2 = answer2_params 2001
 
