@@ -36,11 +36,16 @@ let ``Answer 1 for example input`` () =
        let expected: Result<_, string> = Ok 37327623L
        actual = expected @>
 
-[<Fact(Skip="TODO")>]
+[<Fact>]
 let ``Answer 2 for example input`` () =
-  let input = parseInput exampleInput
+  let input = parseInput """
+1
+2
+3
+2024
+  """
 
   test
-    <@ let actual = Result.bind answer2 input
-       let expected: Result<int, string> = Ok 31
+    <@ let actual = Result.bind (answer2_params 2000) input
+       let expected: Result<_, string> = Ok 23L
        actual = expected @>
