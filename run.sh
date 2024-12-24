@@ -11,4 +11,4 @@ fi
 
 export AOC_SESSION_COOKIE
 export AOC_DATA_DIR=${AOC_DATA_DIR:=Input}
-dotnet run --no-launch-profile --project Kodfodrasz.AoC.Cli/Kodfodrasz.AoC.Cli.fsproj
+dotnet run -c Release --no-launch-profile --project Kodfodrasz.AoC.Cli/Kodfodrasz.AoC.Cli.fsproj
