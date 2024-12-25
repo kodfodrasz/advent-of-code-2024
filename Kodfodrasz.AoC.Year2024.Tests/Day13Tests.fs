@@ -49,7 +49,7 @@ let ``Parsing example input`` () =
 [<Fact>]
 let ``Answer 1 helper test 1`` () =
   test <@
-    Some (80, 40) = solve { 
+    Some (80L, 40L) = solve { 
       ButtonA = 94, 34
       ButtonB = 22, 67
       Prize = 8400, 5400 }
@@ -70,14 +70,14 @@ let ``Answer 1 for example input`` () =
 
   test
     <@ let actual = Result.bind answer1 input
-       let expected: Result<_, string> = Ok 480
+       let expected: Result<_, string> = Ok 480L
        actual = expected @>
 
-[<Fact(Skip="TODO")>]
+[<Fact(Skip="No example result for part 2")>]
 let ``Answer 2 for example input`` () =
   let input = parseInput exampleInput
 
   test
     <@ let actual = Result.bind answer2 input
-       let expected: Result<_, string> = Ok 31
+       let expected: Result<_, string> = Ok 31L
        actual = expected @>

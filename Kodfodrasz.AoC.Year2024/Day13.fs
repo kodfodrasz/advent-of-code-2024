@@ -7,9 +7,9 @@ open Kodfodrasz.AoC
 open MathNet.Numerics.LinearAlgebra
 
 type Entry =
-  { ButtonA : int*int
-    ButtonB : int*int
-    Prize   : int*int }
+  { ButtonA : int64 * int64
+    ButtonB : int64 * int64
+    Prize   : int64 * int64 }
 
 type parsedInput = Entry array
 
@@ -27,8 +27,8 @@ let parseInput (input: string): Result<parsedInput,string> =
   assert (matchesButtonA.Count = matchesButtonB.Count)
   assert (matchesButtonA.Count = matchesPrize.Count)
 
-  let getVals (m : Match) : int*int = 
-    (m.Groups["x"].Value |> int), (m.Groups["y"].Value |> int)
+  let getVals (m : Match) : int64 * int64 = 
+    (m.Groups["x"].Value |> int64), (m.Groups["y"].Value |> int64)
 
   let buttonA = 
     matchesButtonA
@@ -49,7 +49,7 @@ let parseInput (input: string): Result<parsedInput,string> =
   |> Seq.toArray
   |> Ok
 
-let solve (entry:Entry) : (int*int) option = 
+let solve (entry:Entry) : (int64 * int64) option = 
   let v e =
     let x = fst e |> double
     let y = snd e |> double
@@ -62,8 +62,8 @@ let solve (entry:Entry) : (int*int) option =
   let M = DenseMatrix.ofColumns [va; vb]
   let x = M.Solve(vp)
   
-  let a = x[0] |> Double.Round |> int 
-  let b = x[1] |> Double.Round |> int
+  let a = x[0] |> Double.Round |> int64
+  let b = x[1] |> Double.Round |> int64
 
   if (a * fst entry.ButtonA + b * fst entry.ButtonB) = fst entry.Prize
     && (a * snd entry.ButtonA + b * snd entry.ButtonB) = snd entry.Prize
@@ -73,13 +73,21 @@ let solve (entry:Entry) : (int*int) option =
 let answer1 (data : parsedInput) =
   data
   |> Seq.choose solve
-  |> Seq.map (fun (a, b) -> 3 * a + b)
+  |> Seq.map (fun (a, b) -> 3L * a + b)
   |> Seq.sum
   |> Ok
 
 let answer2 (data : parsedInput) =
-  failwith "TODO"
-
+  data
+  |> Seq.map(fun e -> 
+    let px = 10000000000000L + fst e.Prize
+    let py = 10000000000000L + snd e.Prize
+    { e with  Prize = px, py }
+  )
+  |> Seq.choose solve
+  |> Seq.map (fun (a, b) -> 3L * a + b)
+  |> Seq.sum
+  |> Ok
 type Solver() =
   inherit SolverBase("Claw Contraption")
   with
