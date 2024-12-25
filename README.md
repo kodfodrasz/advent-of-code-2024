@@ -19,7 +19,7 @@
 What is this? My solutions for the Advent of Code programming challenge in year 2024.
 If you would like to know more about it, you can read about it here: <https://adventofcode.com/>
 
-![CI workflow status](https://github.com/kodfodrasz/advent-of-code-2024/actions/workflows/main.yaml/badge.svg)
+![CI workflow status](https://github.com/kodfodrasz/advent-of-code-2024/actions/workflows/ci.yaml/badge.svg)
 
 ## It is that time of the year again...
 
