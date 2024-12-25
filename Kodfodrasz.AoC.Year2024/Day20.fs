@@ -3,6 +3,8 @@ module Kodfodrasz.AoC.Year2024.Day20
 open System
 open System.Text.RegularExpressions
 open Kodfodrasz.AoC
+open MathNet.Numerics
+open MathNet.Numerics.LinearAlgebra
 
 type parsedInput = char array array
 
@@ -46,8 +48,6 @@ let cheats i j (arr : char array array) =
       // yield i, j-1
       yield i, j-2
   }
-
-
 
 let answer1_params limit (data : parsedInput) =
   let start = data |> tryFindIndex ((=)'S') |> Option.get
@@ -102,8 +102,67 @@ let answer1_params limit (data : parsedInput) =
 
 let answer1 = answer1_params 100
 
-let answer2 (data : parsedInput) =
-  failwith "TODO"
+let answer2_params radius threshold (data : parsedInput) =
+  let start = data |> tryFindIndex ((=)'S') |> Option.get
+  let finish = data |> tryFindIndex ((=)'E') |> Option.get
+
+  let rec walk path (i,j) =
+    let c = data[i][j]
+    match c with
+    | 'E' -> (i,j) :: path |> List.rev |> List.toArray
+    | '.' | 'S' -> 
+      let next = 
+        data 
+        |> steps i j 
+        |> Seq.where (fun (ii,jj) -> 
+            let s = data[ii][jj]
+            s = 'S' || s = '.' || s = 'E')
+        |> Seq.except (Seq.truncate 1 path) 
+        |> Seq.exactlyOne
+      walk ((i,j) :: path) next
+    | _ -> failwith "Invalid position, should never happen"
+
+  let path = walk [] start
+
+  assert (finish = (Array.last path))
+
+  let distances = 
+    path
+    |> Array.mapi (fun idx (row, col) -> (row, col), (Array.length path - idx - 1))
+    |> Map.ofArray
+
+  let cheat_savings =
+    distances.Keys
+    |> Seq.collect (fun (i, j) ->
+        distances
+        |> Map.filter (fun (k, l) v -> 
+          let md = int <| Distance.Manhattan (
+            vector [double i; double j],
+            vector [double k; double l])
+          md <= radius
+        )
+        |> Map.map (fun (k, l) d -> 
+          let md = int <| Distance.Manhattan (
+            vector [double i; double j],
+            vector [double k; double l])
+          let f = distances |> Map.find (i, j)
+          let t = distances |> Map.find (k, l)
+          let saved = f - t - md
+          saved
+        )
+        |> Map.values
+    )
+    |> Seq.groupBy id
+    |> Map.ofSeq
+    |> Map.map (fun _ s -> s |> Seq.length)
+
+  cheat_savings
+  |> Map.filter (fun k v -> k >= threshold)
+  |> Map.values
+  |> Seq.sum
+  |> Ok
+
+let answer2 = answer2_params 20 100
 
 type Solver() =
   inherit SolverBase("Race Condition")

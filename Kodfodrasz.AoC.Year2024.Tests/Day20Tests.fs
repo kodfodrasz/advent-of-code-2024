@@ -61,11 +61,14 @@ let ``Answer 1 for example input`` () =
   test
     <@ answer1_params 20 input = Ok 5 @>
 
-[<Fact(Skip="TODO")>]
+[<Fact>]
 let ``Answer 2 for example input`` () =
-  let input = parseInput exampleInput
+  let input = 
+    parseInput exampleInput 
+    // TODO: Result.get
+    |> Result.defaultWith (fun _ -> failwith "shouldn't happen")
 
   test
-    <@ let actual = Result.bind answer2 input
-       let expected: Result<int, string> = Ok 31
-       actual = expected @>
+    <@ answer2_params 20 50 input = Ok 285 @>
+  test
+    <@ answer2_params 20 76 input = Ok 3 @>
