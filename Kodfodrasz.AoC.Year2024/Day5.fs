@@ -1,6 +1,7 @@
 module Kodfodrasz.AoC.Year2024.Day5
 
 open System
+open System.Collections.Generic
 open System.Text.RegularExpressions
 open Kodfodrasz.AoC
 
@@ -102,8 +103,77 @@ let answer1 (data : parsedInput) =
   |> Seq.sum
   |> Ok
 
+
+type PrintQueueComparer(rules: OrderingRule list) =
+  let rulesByPreceding = 
+    rules
+    |> Seq.groupBy (fun r -> r.Before)
+    |> Map.ofSeq
+    |> Map.map (fun b r -> r |> Seq.map (fun rr -> rr.After) |> Seq.toArray |> Array.sort)
+
+  let rulesByFollowing = 
+    rules
+    |> Seq.groupBy (fun r -> r.After)
+    |> Map.ofSeq
+    |> Map.map (fun b r -> r |> Seq.map (fun rr -> rr.Before) |> Seq.toArray |> Array.sort)
+
+  interface IComparer<int> with
+    member _.Compare(x, y) =
+      // x = 13, y = 29
+      // 
+      let violatesPrecedingRules = 
+        match Map.tryFind x rulesByPreceding with
+        | Some rules ->
+          Array.BinarySearch(rules, y) < 0
+        | None -> false
+
+      let violatesFollowingRules = 
+        match Map.tryFind x rulesByFollowing with
+        | Some rules ->
+          Array.BinarySearch(rules, y) >= 0
+        | None -> false
+
+      if violatesPrecedingRules || violatesFollowingRules then -1
+      else 1
+
 let answer2 (data : parsedInput) =
-  failwith "TODO"
+  let rulesByPreceding = 
+    data.Rules
+    |> Seq.groupBy (fun r -> r.Before)
+    |> Map.ofSeq
+    |> Map.map (fun b r -> r |> Seq.map (fun rr -> rr.After) |> Seq.toArray |> Array.sort)
+
+  let rulesByFollowing = 
+    data.Rules
+    |> Seq.groupBy (fun r -> r.After)
+    |> Map.ofSeq
+    |> Map.map (fun b r -> r |> Seq.map (fun rr -> rr.Before) |> Seq.toArray |> Array.sort)
+
+
+  let middlePage (b:int list) = 
+    let l = List.length b
+    b[l / 2] |> int64
+
+  let violators =
+    data.Batches
+    |> Seq.filter (check rulesByPreceding rulesByFollowing >> not)
+    |> Seq.toList
+
+  let cmp a b = 
+    let comparer = PrintQueueComparer(data.Rules) :> IComparer<int>
+    comparer.Compare(a,b)
+
+  let sorted = 
+    violators
+    |> List.map (List.sortWith cmp)
+
+  let middlePages =
+    sorted
+    |> Seq.map middlePage
+
+  middlePages
+  |> Seq.sum
+  |> Ok
 
 type Solver() =
   inherit SolverBase("Print Queue")
