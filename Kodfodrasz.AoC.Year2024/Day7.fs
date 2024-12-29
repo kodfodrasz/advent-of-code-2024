@@ -57,8 +57,32 @@ let answer1 (data : parsedInput) =
   |> Array.sumBy(fun eqn -> eqn.TestValue)
   |> Ok 
 
+let check2 (eqn : CalibrationEquation) = 
+  let concat (a: int64) (b:int64) = 
+    sprintf "%i%i" a b |> int64
+
+  let rec check goal acc terms = 
+    match terms with
+    | [] -> goal = acc
+    | head :: tail ->
+      if acc > goal then false
+      else 
+        if (check goal (concat acc head) tail) then
+          true
+        elif (check goal (acc + head) tail) then
+          true
+        else
+          check goal (acc * head) tail
+  match eqn.Terms with
+  | [] -> false
+  | h :: t -> check eqn.TestValue h t
+
 let answer2 (data : parsedInput) =
-  failwith "TODO"
+  data
+  |> List.toArray
+  |> Array.Parallel.filter check2
+  |> Array.sumBy(fun eqn -> eqn.TestValue)
+  |> Ok
 
 type Solver() =
   inherit SolverBase("Bridge Repair")

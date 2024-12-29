@@ -85,11 +85,24 @@ let ``Answer 1 for example input`` () =
        let expected: Result<_, string> = Ok 3749L
        actual = expected @>
 
-[<Fact(Skip="TODO")>]
+[<Fact>]
+let ``Answer 2 helper function: check2`` () =
+  let input = parseInput exampleInput |> Result.get
+
+  test <@ true = Day7.check2 input[0] @>
+  test <@ true = Day7.check2 input[1] @>
+  test <@ true = Day7.check2 input[3] @>
+  test <@ true = Day7.check2 input[4] @>
+  test <@ false = Day7.check2 input[5] @>
+  test <@ true = Day7.check2 input[6] @>
+  test <@ false = Day7.check2 input[7] @>
+  test <@ true = Day7.check2 input[8] @>
+
+[<Fact>]
 let ``Answer 2 for example input`` () =
   let input = parseInput exampleInput
 
   test
     <@ let actual = Result.bind answer2 input
-       let expected: Result<_, string> = Ok 31
+       let expected: Result<_, string> = Ok 11387L
        actual = expected @>
