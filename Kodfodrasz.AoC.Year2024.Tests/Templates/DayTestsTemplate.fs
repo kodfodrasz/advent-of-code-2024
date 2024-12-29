@@ -3,6 +3,7 @@ module private Kodfodrasz.AoC.Year2024.Tests.DayXTests
 open Xunit
 open Swensen.Unquote.Assertions
 
+open Kodfodrasz.AoC
 open Kodfodrasz.AoC.Year2024
 open Kodfodrasz.AoC.Year2024.DayX
 

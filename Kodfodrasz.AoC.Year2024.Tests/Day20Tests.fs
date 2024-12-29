@@ -3,6 +3,7 @@ module Kodfodrasz.AoC.Year2024.Tests.Day20Tests
 open Xunit
 open Swensen.Unquote.Assertions
 
+open Kodfodrasz.AoC
 open Kodfodrasz.AoC.Year2024
 open Kodfodrasz.AoC.Year2024.Day20
 
@@ -64,9 +65,7 @@ let ``Answer 1 for example input`` () =
 [<Fact>]
 let ``Answer 2 for example input`` () =
   let input = 
-    parseInput exampleInput 
-    // TODO: Result.get
-    |> Result.defaultWith (fun _ -> failwith "shouldn't happen")
+    parseInput exampleInput |> Result.get
 
   test
     <@ answer2_params 20 50 input = Ok 285 @>
