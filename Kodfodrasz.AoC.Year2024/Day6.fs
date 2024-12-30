@@ -15,50 +15,100 @@ let parseInput (input: string): Result<parsedInput, string> =
 type coords = int * int
 type direction = North | East | South | West
 
-let answer1 (data : parsedInput) =
-  let rec walk (visited : Set<coords>) (map : char array array) (pos:coords) (dir:direction) : Set<coords> =
-    let outOfBounds pos = 
-      let r, c = pos
-      r < 0 || c < 0 || r >= map.Length || r >= map[0].Length
+let rec walk (visited : Map<coords,direction>) (map : char array array) (pos:coords) (dir:direction) : Map<coords,direction> =
+  let outOfBounds pos = 
+    let r, c = pos
+    r < 0 || c < 0 || r >= map.Length || c >= map[0].Length
 
-    let isObstructed aim =
-      let r, c = aim
-      if outOfBounds aim then false
-      else map[r][c] = '#'
+  let isObstructed aim =
+    let r, c = aim
+    if outOfBounds aim then false
+    else map[r][c] = '#'
 
-    if outOfBounds pos then
-      Set.remove pos visited
+  if outOfBounds pos then
+    Map.remove pos visited
+  else
+    let r, c = pos
+    let aim = 
+      match dir with
+      | North -> r - 1, c
+      | East -> r, c + 1
+      | South -> r + 1, c
+      | West -> r, c - 1
+    if not(isObstructed aim) then
+      walk (Map.add pos dir visited) map aim dir
     else
-      let r, c = pos
-      let aim = 
+      let turnedDir = 
         match dir with
-        | North -> r - 1, c
-        | East -> r, c + 1
-        | South -> r + 1, c
-        | West -> r, c - 1
-      if not(isObstructed aim) then
-        walk (Set.add pos visited) map aim dir
-      else
-        let turnedDir = 
-          match dir with
-          | North -> East
-          | East -> South
-          | South -> West
-          | West -> North
-        walk visited map pos turnedDir
+        | North -> East
+        | East -> South
+        | South -> West
+        | West -> North
+      walk visited map pos turnedDir
 
+let answer1 (data : parsedInput) =
   let map  = data // maybe replace the initial position character?
   let pos : coords = 
     Array.tryFindIndexJagged ((=)'^') map
     |> Option.get
 
-  let visited = walk Set.empty map pos North
+  let visited = walk Map.empty map pos North
 
-  Set.count visited
+  Map.count visited
   |> Ok
 
+type WalkResult = OutOfBounds | Loop
+
+let rec walk2 (extraBlock: coords) (visited: Set<coords * direction>) (map: char array array) (pos:coords) (dir:direction) : WalkResult =
+  let outOfBounds pos = 
+    let r, c = pos
+    r < 0 || c < 0 || r >= map.Length || c >= map[0].Length
+
+  let isObstructed aim =
+    let r, c = aim
+    if outOfBounds aim then false
+    else map[r][c] = '#' || aim = extraBlock
+
+  if outOfBounds pos then
+    OutOfBounds
+  elif visited |> Set.contains (pos, dir) then
+    Loop
+  else
+    let r, c = pos
+    let aim = 
+      match dir with
+      | North -> r - 1, c
+      | East -> r, c + 1
+      | South -> r + 1, c
+      | West -> r, c - 1
+    if not(isObstructed aim) then
+      walk2 extraBlock (Set.add (pos, dir) visited) map aim dir
+    else
+      let turnedDir = 
+        match dir with
+        | North -> East
+        | East -> South
+        | South -> West
+        | West -> North
+      walk2 extraBlock visited map pos turnedDir
+
 let answer2 (data : parsedInput) =
-  failwith "TODO"
+  let map  = data // maybe replace the initial position character?
+  let pos : coords = 
+    Array.tryFindIndexJagged ((=)'^') map
+    |> Option.get
+
+  let visited = 
+    walk Map.empty map pos North
+    |> Map.keys
+    |> Array.ofSeq
+  
+  let blockable = 
+    visited
+    |>Array.Parallel.filter (fun p -> Loop = walk2 p Set.empty map pos North)
+  
+  Array.length blockable
+  |> Ok
 
 type Solver() =
   inherit SolverBase("Guard Gallivant")
