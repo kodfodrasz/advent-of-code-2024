@@ -17,7 +17,7 @@ let templateTestFile = sprintf "Kodfodrasz.AoC.Year%d.Tests/Templates/DayTestsTe
 
 // Argument parser
 type CLIArgs =
-    | Day of int
+    | [<MainCommand; ExactlyOnce; Last>] Day of int
     interface IArgParserTemplate with
         member s.Usage =
             match s with
