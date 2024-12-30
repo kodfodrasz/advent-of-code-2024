@@ -23,3 +23,12 @@ let shuffle arr =
     copy |> swap i j |> ignore
   
   copy
+
+let tryFindIndexJagged predicate  (arr: _ array array)  =
+    arr
+    |> Array.mapi (fun i row   -> 
+          match Array.tryFindIndex predicate row with
+          | Some j -> Some (i, j)
+          | _ -> None)
+    |> Seq.choose id
+    |> Seq.tryHead
