@@ -43,8 +43,8 @@ module UserMenu =
       let last = lastMaybe |> Option.get
 
       if s = last
-      then printfn " >%2i< %4i Day %2i : %s" idx s.Year s.Day s.Name
-      else printfn "  %2i  %4i Day %2i : %s" idx s.Year s.Day s.Name
+      then printfn " >%2i< %4i Day %2i : %s" s.Day s.Year s.Day s.Name
+      else printfn "  %2i  %4i Day %2i : %s" s.Day s.Year s.Day s.Name
 
   // MENU INPUT PARSING
 
@@ -81,7 +81,7 @@ module UserMenu =
     printfn ""
     input
 
-  let getSolvers allSolvers (command: Command) =
+  let getSolvers (allSolvers : ISolver list) (command: Command) =
     let lastMaybe = List.tryLast allSolvers
 
     match command with
@@ -89,7 +89,7 @@ module UserMenu =
     | Last -> lastMaybe |> Option.map List.singleton
     | Number n ->
         allSolvers
-        |> List.tryItem (n - 1)
+        |> List.tryFind (fun s -> s.Day = n)
         |> Option.map List.singleton
     | Exit -> Some []
     | _ ->
