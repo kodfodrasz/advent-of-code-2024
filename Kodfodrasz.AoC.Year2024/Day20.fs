@@ -26,8 +26,8 @@ let tryFindIndex predicate  (arr: _ array array)  =
 let steps i j (arr : _ array array) =
   seq {
     if (i > 0) then yield i-1, j
-    if (j < Array.length arr[i] - 2) then yield i, j+1
-    if (i < Array.length arr - 2) then yield i+1, j
+    if (j < Array.length arr[i] - 1) then yield i, j+1
+    if (i < Array.length arr - 1) then yield i+1, j
     if (j > 0) then yield i, j-1
   }
 

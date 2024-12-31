@@ -10,7 +10,7 @@ let fold array folder state =
   }
   |> Seq.fold folder state
 
-let foldi array folder state = 
+let foldi folder state  array= 
   seq {
     for row in 0 .. Array2D.length1 array - 1 do
       for col in 0 .. Array2D.length2 array - 1 do
