@@ -28,22 +28,6 @@ let steps i j (arr : _ array2d) =
   }
   |> Seq.toList
 
-//let rec walkCount (map : int array2d) (pos : coords) = 
-//  let i, j = pos
-//  let curr = map[i,j]
-//  if curr = 9 then
-//    1
-//  else
-//    let neighbours = 
-//      steps i j map
-//      |> List.map (fun (i, j) -> (i, j), map[i, j])
-//    let good = 
-//      neighbours
-//      |> List.filter(fun (p, v) -> v = curr + 1)
-
-//    good
-//    |> List.sumBy(fun (p, v) -> walkCount map p)
-
 
 let answer1 (data : parsedInput) =
   let map = array2D data
@@ -53,7 +37,7 @@ let answer1 (data : parsedInput) =
     |> List.rev
     |> List.toArray
 
-  let rec walkCount (map : int array2d) (acc:coords list)  (pos : coords) = 
+  let rec trailScore (map : int array2d) (acc:coords list)  (pos : coords) = 
     let i, j = pos
     let curr = map[i,j]
     if curr = 9 then
@@ -68,15 +52,41 @@ let answer1 (data : parsedInput) =
 
       good
       |> List.map fst
-      |> List.fold (walkCount map) acc
+      |> List.fold (trailScore map) acc
 
   zeroes
-  |> Array.Parallel.sumBy (walkCount map List.empty >> Seq.distinct >> Seq.length)
+  |> Array.Parallel.sumBy (trailScore map List.empty >> Seq.distinct >> Seq.length)
   |> Ok
 
 
 let answer2 (data : parsedInput) =
-  failwith "TODO"
+  let map = array2D data
+  let zeroes = 
+    map
+    |> Array2D.foldi (fun i j l n -> if n = 0 then (i,j) :: l else l ) List.empty
+    |> List.rev
+    |> List.toArray
+
+  // After realizing at Part 1 that this was not exactly what was requested I immediately felt that this will come handy...
+  let rec trailRating (map : int array2d) (pos : coords) = 
+   let i, j = pos
+   let curr = map[i,j]
+   if curr = 9 then
+     1
+   else
+     let neighbours = 
+       steps i j map
+       |> List.map (fun (i, j) -> (i, j), map[i, j])
+     let good = 
+       neighbours
+       |> List.filter(fun (p, v) -> v = curr + 1)
+
+     good
+     |> List.sumBy(fun (p, v) -> trailRating map p)
+
+  zeroes
+  |> Array.Parallel.sumBy (trailRating map)
+  |> Ok
 
 type Solver() =
   inherit SolverBase("Hoof It")
