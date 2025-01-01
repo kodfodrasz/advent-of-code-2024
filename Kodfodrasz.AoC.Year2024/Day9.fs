@@ -1,7 +1,6 @@
 module Kodfodrasz.AoC.Year2024.Day9
 
 open System
-open System.Text.RegularExpressions
 open Kodfodrasz.AoC
 open System.Collections.Generic
 
@@ -62,9 +61,9 @@ let checksum blocks =
   ) blocks
 
 let defrag1 blocks : Block array = 
-  let blocks = System.Collections.Generic.List<Block>(blocks :> Block seq)
-
+  let blocks = List<Block>(blocks :> Block seq)
   let cmp = BlockPosComparer()
+
   let mutable fragmented = true
   while fragmented do
     let firstFreeIdx = blocks.FindIndex(function
@@ -115,8 +114,91 @@ let answer1 (blocks : parsedInput) =
   |> checksum
   |> Ok
 
-let answer2 (data : parsedInput) =
-  failwith "TODO"
+let defrag2 blocks : Block array = 
+  let blocks = List<Block>(blocks :> Block seq)
+  let cmp = BlockPosComparer()
+  let freeMap = 
+    blocks
+    |> Seq.filter(function
+      | Free (pos, size) -> size > 0
+      | _ -> false)
+    |> Seq.groupBy(size)
+    |> Map.ofSeq
+    |> Map.map(fun k b -> 
+      let freeList = List<Block>(b)
+      freeList.Sort(cmp)
+      freeList
+    )
+    |> (fun m ->
+      let mutable map = m
+      for i in 0..9 do
+        if not (map.ContainsKey(i)) then
+          map <- map.Add(i, List<Block>())
+      map
+    )
+
+  let files =
+    blocks 
+    |> Seq.filter(function
+      | File(pos, size, id) -> true
+      | _ -> false)
+    |>  List<Block>
+  files.Sort(cmp)
+  files.Reverse()
+
+  let rec getFirstFit minSize maxPos = 
+    let freeMaybe = 
+      freeMap.Values
+      |> Seq.choose(Seq.tryHead)
+      |> Seq.filter(function
+          | Free (pos, size) -> size >= minSize && pos < maxPos
+          | _ -> false)
+      |> Seq.sortBy (pos)
+      |> Seq.tryHead
+
+    freeMaybe
+    |> Option.iter(fun free -> 
+      freeMap[size free].RemoveAt(0) |> ignore
+    )
+
+    freeMaybe
+
+  let defraggedFiles = 
+    files
+    |> Seq.map(fun file -> 
+      // find first fitting free space.
+      // check at the first fitting size, and try larger ones if there is none remaining
+      // only consider values which have lower pos than the file!
+      match (getFirstFit (size file) (pos file)) with
+      | None -> file
+      | Some free -> 
+          let moved = File(
+            pos free,
+            size file,
+            fid file
+          )
+          let remSize = size free - size file
+          if remSize > 0 then
+            freeMap[remSize].Add(Free(
+              pos free + size file,
+              remSize
+              )
+            )
+            freeMap[remSize].Sort()
+          moved
+    )
+
+  Seq.concat [ 
+    defraggedFiles;
+    (freeMap.Values |> Seq.collect (fun fmv -> fmv :> Block seq))]
+  |> Seq.sortBy pos
+  |> Seq.toArray
+
+let answer2 (blocks : parsedInput) =
+  blocks
+  |> defrag2
+  |> checksum
+  |> Ok
 
 type Solver() =
   inherit SolverBase("Disk Fragmenter")

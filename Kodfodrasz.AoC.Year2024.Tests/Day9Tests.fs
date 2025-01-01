@@ -74,11 +74,37 @@ let ``Answer 1 for example input`` () =
        let expected: Result<_, string> = Ok 1928L
        actual = expected @>
 
-[<Fact(Skip="TODO")>]
+[<Fact>]
+let ``Answer 2 for example input for 12345`` () =
+  let blocks = parseInput "12345" |> Result.get
+  // BLOCKS BEFORE: 0..111....22222
+  // BLOCKS AFTER : 0..111....22222
+  // POS          : 0123456789
+  // CHECKSUM     : 132 = 0 + 3 + 4 + 5+ 20 + 22 + 24 + 26 + 28
+  test <@  answer2 blocks = Ok 132L @>
+
+[<Fact>]
+let ``Answer 2 for example input for 1313165`` () =
+  let blocks = parseInput "1313165" |> Result.get
+  // BLOCKS BEFORE: 0...1...2......33333
+  // BLOCKS AFTER : 021      33333
+  // POS          : 00000000001111111111
+  //                01234567890123456789
+  // CHECKSUM     : 169 = 0 + 2 + 2 + 27 + 30 + 33 + 36 + 39
+  test <@  answer2 blocks = Ok 169L @>
+
+[<Fact>]
+let ``Answer 2 for example input for 9953877292941`` () =
+  let blocks = parseInput "9953877292941" |> Result.get
+  // https://www.reddit.com/r/adventofcode/comments/1haa13a/comment/m2aioi2/
+  // 00000000063333333.11111...22222222................444444444..555555555.....
+  test <@  answer2 blocks = Ok 5768L @>
+
+[<Fact>]
 let ``Answer 2 for example input`` () =
   let input = parseInput exampleInput
 
   test
     <@ let actual = Result.bind answer2 input
-       let expected: Result<_, string> = Ok 31L
+       let expected: Result<_, string> = Ok 2858L
        actual = expected @>
