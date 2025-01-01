@@ -40,6 +40,31 @@ let ``Parsing example input`` () =
     <@ let actual = parseInput exampleInput
        actual = Ok expected @>
 
+
+[<Fact>]
+let ``Parsing example input for 12345`` () =
+  test
+    <@ 
+      let expected = Ok [|
+        File (0, 1, 0)
+        Free (1, 2)
+        File (3, 3, 1)
+        Free (6, 4)
+        File (10, 5, 2)
+      |] 
+      let actual = parseInput "12345"
+      actual = expected
+  @>
+
+[<Fact>]
+let ``Answer 1 for example input for 12345`` () =
+  let blocks = parseInput "12345" |> Result.get
+  // BLOCKS BEFORE: 0..111....22222
+  // BLOCKS AFTER : 022111222
+  // POS          : 0123456789
+  // CHECKSUM     : 60 = 0 + 2 + 4 + 3 + 4 + 5 + 12 + 14 + 16
+  test <@  answer1 blocks = Ok 60L @>
+
 [<Fact>]
 let ``Answer 1 for example input`` () =
   let input = parseInput exampleInput

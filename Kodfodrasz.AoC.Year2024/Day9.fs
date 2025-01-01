@@ -53,55 +53,61 @@ let parseInput (input: string): Result<parsedInput,string> =
 
 let checksum blocks = 
   Seq.sumBy(function
-      | File(pos, _, id) -> int64(pos) * int64(id)
+      | File(pos, size, id) -> 
+          let mutable sum = 0L
+          for x in 0 .. size - 1 do
+            sum <- sum + int64(pos + x) * int64(id)
+          sum 
       | Free _ -> 0
   ) blocks
 
 let defrag1 blocks : Block array = 
-  let blocks2 = List<Block>()
-  blocks2.AddRange(blocks)
+  let blocks = System.Collections.Generic.List<Block>(blocks :> Block seq)
 
   let cmp = BlockPosComparer()
   let mutable fragmented = true
   while fragmented do
-    let firstFreeIdx = blocks2.FindIndex(function
+    let firstFreeIdx = blocks.FindIndex(function
       | Free (pos, size) -> size > 0
       | _ -> false)
-    let lastFileIdx = blocks2.FindLastIndex(function
+    let lastFileIdx = blocks.FindLastIndex(function
       | File(pos, size, id) -> true
       | _ -> false)
     
     fragmented <- firstFreeIdx >= 0 && lastFileIdx >= 0
 
     if fragmented then
-      let free = blocks2[firstFreeIdx]
-      let file = blocks2[lastFileIdx]
+      let free = blocks[firstFreeIdx]
+      let file = blocks[lastFileIdx]
 
-      if size free = size file then
-        blocks2[firstFreeIdx] <- File(
-          pos free, size file,
-          fid file)
-        blocks2.RemoveAt(lastFileIdx)
-      elif size free > size file then
-        blocks2[lastFileIdx] <- File(
+      if pos free > pos file then
+        blocks.RemoveAt(firstFreeIdx)
+      elif size free = size file then
+        blocks[firstFreeIdx] <- File(
           pos free,
           size file,
           fid file)
-        blocks2[firstFreeIdx] <- Free(
+        blocks.RemoveAt(lastFileIdx)
+      elif size free > size file then
+        blocks[lastFileIdx] <- File(
+          pos free,
+          size file,
+          fid file)
+        blocks[firstFreeIdx] <- Free(
           pos free + size file,
-          size free - size free)
+          size free - size file)
       else // file is bigger
-        blocks2[firstFreeIdx] <- File(
+        blocks[firstFreeIdx] <- File(
           pos free,
           size free,
           fid file)
-        blocks2[lastFileIdx] <- File(
+        blocks[lastFileIdx] <- File(
           pos file,
           size file - size free,
           fid file)
-      blocks2.Sort(cmp)
+      blocks.Sort(cmp)
     
-  blocks2.ToArray()
+  blocks.ToArray()
 
 let answer1 (blocks : parsedInput) =
   blocks
