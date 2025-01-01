@@ -55,5 +55,5 @@ let ``Answer 2 for example input`` () =
 
   test
     <@ let actual = Result.bind answer2 input
-       let expected: Result<_, string> = Ok 31
+       let expected: Result<_, string> = Ok 31L
        actual = expected @>
