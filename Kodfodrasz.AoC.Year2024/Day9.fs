@@ -1,7 +1,6 @@
 module Kodfodrasz.AoC.Year2024.Day9
 
 open System
-open System.Text.RegularExpressions
 open Kodfodrasz.AoC
 open System.Collections.Generic
 
@@ -62,9 +61,9 @@ let checksum blocks =
   ) blocks
 
 let defrag1 blocks : Block array = 
-  let blocks = System.Collections.Generic.List<Block>(blocks :> Block seq)
-
+  let blocks = List<Block>(blocks :> Block seq)
   let cmp = BlockPosComparer()
+
   let mutable fragmented = true
   while fragmented do
     let firstFreeIdx = blocks.FindIndex(function
@@ -115,8 +114,88 @@ let answer1 (blocks : parsedInput) =
   |> checksum
   |> Ok
 
-let answer2 (data : parsedInput) =
-  failwith "TODO"
+let defrag2 blocks : Block array = 
+  let blocks = List<Block>(blocks :> Block seq)
+  let cmp = BlockPosComparer()
+  let freeMap = 
+    blocks
+    |> Seq.filter(function
+      | Free (pos, size) -> size > 0
+      | _ -> false)
+    |> Seq.groupBy(size)
+    |> Map.ofSeq
+    |> Map.map(fun k b -> List<Block>(b))
+    |> Map.iter(fun k v -> v.Sort(cmp))
+
+  let files =
+    blocks 
+    |> Seq.filter(function
+      | File(pos, size, id) -> true
+      | _ -> false)
+    |>  List<Block>
+  files.Sort(cmp)
+  files.Reverse()
+
+  for file in files do
+    // find first fitting free space.
+    // check at the first fitting size, and try larger ones if there is none remaining
+    // only consider values which have lower pos than the file!
+    
+    // move the file
+    // if there is remaining size add it to the appropriate set size.
+    // also sort it if it was modified
+    
+    ()
+
+  let mutable fragmented = true
+  while fragmented do
+    let firstFreeIdx = blocks.FindIndex(function
+      | Free (pos, size) -> size > 0
+      | _ -> false)
+    let lastFileIdx = blocks.FindLastIndex(function
+      | File(pos, size, id) -> true
+      | _ -> false)
+    
+    fragmented <- firstFreeIdx >= 0 && lastFileIdx >= 0
+
+    if fragmented then
+      let free = blocks[firstFreeIdx]
+      let file = blocks[lastFileIdx]
+
+      if pos free > pos file then
+        blocks.RemoveAt(firstFreeIdx)
+      elif size free = size file then
+        blocks[firstFreeIdx] <- File(
+          pos free,
+          size file,
+          fid file)
+        blocks.RemoveAt(lastFileIdx)
+      elif size free > size file then
+        blocks[lastFileIdx] <- File(
+          pos free,
+          size file,
+          fid file)
+        blocks[firstFreeIdx] <- Free(
+          pos free + size file,
+          size free - size file)
+      else // file is bigger
+        blocks[firstFreeIdx] <- File(
+          pos free,
+          size free,
+          fid file)
+        blocks[lastFileIdx] <- File(
+          pos file,
+          size file - size free,
+          fid file)
+      blocks.Sort(cmp)
+    
+  blocks.ToArray()
+
+let answer2 (blocks : parsedInput) =
+  blocks
+  |> defrag2
+  |> checksum
+  |> Ok
 
 type Solver() =
   inherit SolverBase("Disk Fragmenter")

@@ -74,11 +74,11 @@ let ``Answer 1 for example input`` () =
        let expected: Result<_, string> = Ok 1928L
        actual = expected @>
 
-[<Fact(Skip="TODO")>]
+[<Fact>]
 let ``Answer 2 for example input`` () =
   let input = parseInput exampleInput
 
   test
     <@ let actual = Result.bind answer2 input
-       let expected: Result<_, string> = Ok 31L
+       let expected: Result<_, string> = Ok 2858L
        actual = expected @>
