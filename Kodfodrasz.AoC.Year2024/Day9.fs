@@ -124,8 +124,11 @@ let defrag2 blocks : Block array =
       | _ -> false)
     |> Seq.groupBy(size)
     |> Map.ofSeq
-    |> Map.map(fun k b -> List<Block>(b))
-    |> Map.iter(fun k v -> v.Sort(cmp))
+    |> Map.map(fun k b -> 
+      let freeList = List<Block>(b)
+      freeList.Sort(cmp)
+      freeList
+    )
 
   let files =
     blocks 
@@ -136,60 +139,54 @@ let defrag2 blocks : Block array =
   files.Sort(cmp)
   files.Reverse()
 
-  for file in files do
-    // find first fitting free space.
-    // check at the first fitting size, and try larger ones if there is none remaining
-    // only consider values which have lower pos than the file!
-    
-    // move the file
-    // if there is remaining size add it to the appropriate set size.
-    // also sort it if it was modified
-    
-    ()
+  let rec getFirstFit minSize maxPos = 
+    if minSize > 9 then
+      None
+    else
+      
+      let idx = 
+        if freeMap.ContainsKey minSize then
+          freeMap[minSize].FindIndex(function
+          | Free (pos, size) -> pos < maxPos
+          | _ -> false)
+        else -1
+      if idx >= 0 then
+        let free = freeMap[minSize][idx]
+        freeMap[minSize].RemoveAt(idx)
+        Some free
+      else
+        getFirstFit (minSize + 1) maxPos
 
-  let mutable fragmented = true
-  while fragmented do
-    let firstFreeIdx = blocks.FindIndex(function
-      | Free (pos, size) -> size > 0
-      | _ -> false)
-    let lastFileIdx = blocks.FindLastIndex(function
-      | File(pos, size, id) -> true
-      | _ -> false)
-    
-    fragmented <- firstFreeIdx >= 0 && lastFileIdx >= 0
+  let defraggedFiles = 
+    files
+    |> Seq.map(fun file -> 
+      // find first fitting free space.
+      // check at the first fitting size, and try larger ones if there is none remaining
+      // only consider values which have lower pos than the file!
+      match (getFirstFit (size file) (pos file)) with
+      | None -> file
+      | Some free -> 
+          let moved = File(
+            pos free,
+            size file,
+            fid file
+          )
+          let remSize = size free - size file
+          if remSize > 0 then
+            freeMap[remSize].Add(Free(
+              pos free + size file,
+              remSize
+              )
+            )
+            freeMap[remSize].Sort()
+          moved
+    )
 
-    if fragmented then
-      let free = blocks[firstFreeIdx]
-      let file = blocks[lastFileIdx]
-
-      if pos free > pos file then
-        blocks.RemoveAt(firstFreeIdx)
-      elif size free = size file then
-        blocks[firstFreeIdx] <- File(
-          pos free,
-          size file,
-          fid file)
-        blocks.RemoveAt(lastFileIdx)
-      elif size free > size file then
-        blocks[lastFileIdx] <- File(
-          pos free,
-          size file,
-          fid file)
-        blocks[firstFreeIdx] <- Free(
-          pos free + size file,
-          size free - size file)
-      else // file is bigger
-        blocks[firstFreeIdx] <- File(
-          pos free,
-          size free,
-          fid file)
-        blocks[lastFileIdx] <- File(
-          pos file,
-          size file - size free,
-          fid file)
-      blocks.Sort(cmp)
-    
-  blocks.ToArray()
+  Seq.concat [ 
+    defraggedFiles;
+    (freeMap.Values |> Seq.collect (fun fmv -> fmv :> Block seq))]
+  |> Seq.sortBy pos
+  |> Seq.toArray
 
 let answer2 (blocks : parsedInput) =
   blocks
