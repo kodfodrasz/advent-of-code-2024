@@ -75,6 +75,15 @@ let ``Answer 1 for example input`` () =
        actual = expected @>
 
 [<Fact>]
+let ``Answer 2 for example input for 12345`` () =
+  let blocks = parseInput "12345" |> Result.get
+  // BLOCKS BEFORE: 0..111....22222
+  // BLOCKS AFTER : 0..111....22222
+  // POS          : 0123456789
+  // CHECKSUM     : 132 = 0 + 3 + 4 + 5+ 20 + 22 + 24 + 26 + 28
+  test <@  answer2 blocks = Ok 132L @>
+
+[<Fact>]
 let ``Answer 2 for example input`` () =
   let input = parseInput exampleInput
 
