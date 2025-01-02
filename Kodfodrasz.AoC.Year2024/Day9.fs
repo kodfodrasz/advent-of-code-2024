@@ -129,6 +129,13 @@ let defrag2 blocks : Block array =
       freeList.Sort(cmp)
       freeList
     )
+    |> (fun m ->
+      let mutable map = m
+      for i in 0..9 do
+        if not (map.ContainsKey(i)) then
+          map <- map.Add(i, List<Block>())
+      map
+    )
 
   let files =
     blocks 

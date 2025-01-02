@@ -84,6 +84,16 @@ let ``Answer 2 for example input for 12345`` () =
   test <@  answer2 blocks = Ok 132L @>
 
 [<Fact>]
+let ``Answer 2 for example input for 1313165`` () =
+  let blocks = parseInput "1313165" |> Result.get
+  // BLOCKS BEFORE: 0...1...2......33333
+  // BLOCKS AFTER : 021      33333
+  // POS          : 00000000001111111111
+  //                01234567890123456789
+  // CHECKSUM     : 169 = 0 + 2 + 2 + 27 + 30 + 33 + 36 + 39
+  test <@  answer2 blocks = Ok 169L @>
+
+[<Fact>]
 let ``Answer 2 for example input`` () =
   let input = parseInput exampleInput
 
