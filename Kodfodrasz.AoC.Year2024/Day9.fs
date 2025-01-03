@@ -147,22 +147,21 @@ let defrag2 blocks : Block array =
   files.Reverse()
 
   let rec getFirstFit minSize maxPos = 
-    if minSize > 9 then
-      None
-    else
-      
-      let idx = 
-        if freeMap.ContainsKey minSize then
-          freeMap[minSize].FindIndex(function
-          | Free (pos, size) -> pos < maxPos
+    let freeMaybe = 
+      freeMap.Values
+      |> Seq.choose(Seq.tryHead)
+      |> Seq.filter(function
+          | Free (pos, size) -> size >= minSize && pos < maxPos
           | _ -> false)
-        else -1
-      if idx >= 0 then
-        let free = freeMap[minSize][idx]
-        freeMap[minSize].RemoveAt(idx)
-        Some free
-      else
-        getFirstFit (minSize + 1) maxPos
+      |> Seq.sortBy (pos)
+      |> Seq.tryHead
+
+    freeMaybe
+    |> Option.iter(fun free -> 
+      freeMap[size free].RemoveAt(0) |> ignore
+    )
+
+    freeMaybe
 
   let defraggedFiles = 
     files

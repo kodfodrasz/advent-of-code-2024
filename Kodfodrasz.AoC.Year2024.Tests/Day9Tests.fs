@@ -94,6 +94,13 @@ let ``Answer 2 for example input for 1313165`` () =
   test <@  answer2 blocks = Ok 169L @>
 
 [<Fact>]
+let ``Answer 2 for example input for 9953877292941`` () =
+  let blocks = parseInput "9953877292941" |> Result.get
+  // https://www.reddit.com/r/adventofcode/comments/1haa13a/comment/m2aioi2/
+  // 00000000063333333.11111...22222222................444444444..555555555.....
+  test <@  answer2 blocks = Ok 5768L @>
+
+[<Fact>]
 let ``Answer 2 for example input`` () =
   let input = parseInput exampleInput
 
